@@ -1,9 +1,7 @@
-import "./fonts/ys-display/fonts.css";
 import "./style.css";
-
+import "./fonts/ys-display/fonts.css";
 import { initData } from "./data.js";
 import { processFormData } from "./lib/utils.js";
-
 import { initTable } from "./components/table.js";
 import { initSearching } from "./components/searching.js";
 import { initFiltering } from "./components/filtering.js";
@@ -13,17 +11,18 @@ import { initPagination } from "./components/pagination.js";
 const api = initData();
 
 function collectState() {
-  const state = processFormData(new FormData(sampleTable.container));
+  const formData = new FormData(sampleTable.container);
+  const state = processFormData(formData);
 
   return {
     ...state,
-    rowsPerPage: parseInt(state.rowsPerPage),
-    page: parseInt(state.page ?? 1),
+    rowsPerPage: parseInt(state.rowsPerPage, 10),
+    page: parseInt(state.page ?? 1, 10),
   };
 }
 
 async function render(action) {
-  let state = collectState();
+  const state = collectState();
   let query = {};
 
   query = applySearching(query, state, action);
@@ -67,9 +66,8 @@ const { applyPagination, updatePagination } = initPagination(
   },
 );
 
-async function init() {
+async function initApp() {
   const indexes = await api.getIndexes();
-
   updateIndexes(sampleTable.filter.elements, {
     searchBySeller: indexes.sellers,
   });
@@ -78,4 +76,4 @@ async function init() {
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
 
-init().then(render);
+initApp().then(render);
